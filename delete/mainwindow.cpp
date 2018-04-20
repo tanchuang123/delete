@@ -6,6 +6,8 @@
 #include <QtDebug>
 #include <QFileInfo>
 #include <QFileDialog>
+#include <QFile>
+
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow)
@@ -66,13 +68,52 @@ void MainWindow::deleteExe()
      qDebug()<<first;
      qDebug()<<file_all_path;
      qDebug()<<needStrPath;
-     qDebug()<<deletePath;
-     QFile file(deletePath);
-     if (file.exists())
-     {
-         if(file.remove())
+     qDebug()<<"deletePath:"<<deletePath;
+     QFile file__( "F:/work/WORK/assets");
+//    F:\work\WORK\123\ AliIM2018_taobao(9.12.03C).exe
+//     QDir dir(deletePath);
+//     dir.rmdir(strFileName);
+//     QFile file(deletePath);
+     if(file__.isReadable())
+     file__.setPermissions(QFile::WriteOwner);
+     QFileInfo fileinfo(file__);
+     deleteDirectory(fileinfo);
+     qDebug()<<file__.exists()<<"file__.exists()";
+//     if (file__.exists())
+//     {
+//         qDebug()<<file__.remove()<<"file__.remove()";
+//         if(file__.remove())
+//         {
+//             qDebug()<<QStringLiteral("销毁成功");
+//         }
+//    }
+//     file__.remove();
+}
+void MainWindow::deleteDirectory(QFileInfo fileList)
+{
+
+    if(fileList.isDir())
+    {
+      int childCount =0;
+      QString dir = fileList.filePath();
+      QDir thisDir(dir);
+      childCount = thisDir.entryInfoList().count();
+      QFileInfoList newFileList = thisDir.entryInfoList();
+      if(childCount>2)
+      {
+       for(int i=0;i<childCount;i++)
+       {
+         if(newFileList.at(i).fileName().operator ==(".")|newFileList.at(i).fileName().operator ==(".."))
          {
-             qDebug()<<QStringLiteral("销毁成功");
-         }
+         continue;
+          }
+         deleteDirectory(newFileList.at(i));
+       }
+    }
+      fileList.absoluteDir().rmpath(fileList.fileName());
+    }
+    else if(fileList.isFile())
+    {
+    fileList.absoluteDir().remove(fileList.fileName());
     }
 }
